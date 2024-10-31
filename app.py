@@ -1,17 +1,19 @@
 from flask import Flask, render_template, request, jsonify
 from googleapiclient.discovery import build
 import requests
+from dotenv import load_dotenv
+import os
 
 app = Flask(__name__)
 
 # API Keys
-YOUTUBE_API_KEY = 'AIzaSyA8_iKdapp3esuQZum17dmvH3RumPJwyIM'
-GOOGLE_CSE_API_KEY = 'AIzaSyA8_iKdapp3esuQZum17dmvH3RumPJwyIM'
-GOOGLE_CSE_ID = '6044684123a1c4bb2'
-PUBMED_API_BASE_URL = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi'
+def configure():
+    load_dotenv()
 
+
+configure()
 # YouTube API client setup
-youtube = build('youtube', 'v3', developerKey=YOUTUBE_API_KEY)
+youtube = build('youtube', 'v3', developerKey=os.getenv('YOUTUBE_API_KEY'))
 
 @app.route('/')
 def index():
@@ -68,7 +70,7 @@ def youtube_search_with_ranking(query):
 
 def article_search_with_ranking(query):
     # Fetch articles using Google Custom Search
-    google_cse_url = f"https://www.googleapis.com/customsearch/v1?q={query}&cx={GOOGLE_CSE_ID}&key={GOOGLE_CSE_API_KEY}"
+    google_cse_url = f"https://www.googleapis.com/customsearch/v1?q={query}&cx={os.getenv('GOOGLE_CSE_ID')}&key={os.getenv('GOOGLE_CSE_API_KEY')}"
     response = requests.get(google_cse_url)
     search_results = response.json().get('items', [])
 
@@ -88,7 +90,7 @@ def article_search_with_ranking(query):
 
 def academic_paper_search(query):
     # Fetch academic paper IDs from PubMed API
-    pubmed_url = f"{PUBMED_API_BASE_URL}?db=pubmed&term={query}&retmode=json&retmax=10"
+    pubmed_url = f"{os.getenv('PUBMED_API_BASE_URL')}?db=pubmed&term={query}&retmode=json&retmax=10"
     response = requests.get(pubmed_url)
     pubmed_data = response.json()
 
@@ -114,7 +116,7 @@ def academic_paper_search(query):
 
 def blog_search_with_ranking(query):
     # Fetch blog posts using Google Custom Search API targeting Medium.com as an example
-    google_cse_url = f"https://www.googleapis.com/customsearch/v1?q={query}&cx={GOOGLE_CSE_ID}&key={GOOGLE_CSE_API_KEY}&siteSearch=medium.com"
+    google_cse_url = f"https://www.googleapis.com/customsearch/v1?q={query}&cx={os.getenv('GOOGLE_CSE_ID')}&key={os.getenv('GOOGLE_CSE_API_KEY')}&siteSearch=medium.com"
     response = requests.get(google_cse_url)
     search_results = response.json().get('items', [])
 
